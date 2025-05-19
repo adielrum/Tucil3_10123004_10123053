@@ -7,20 +7,31 @@
 
 using namespace std;
 
-int N, M, num_piece;
-
 int main()
 {
     while (true) {
-        cout << "Input: " << flush;
-        cin >> N >> M >> num_piece;
+        string file_path;
+        cout << "File path: ";
+        cin >> file_path;
+
+        ifstream input_file(file_path);
+        while (!input_file.is_open()) {
+            cout << "Could not open file! Try again: ";
+            cin >> file_path;
+            ifstream input_file(file_path);
+        }
+
+        int N, M, num_piece;
+        input_file >> N >> M >> num_piece;
 
         vector<string> temp_board;
         for(int i = 0; i < N; i++){
             string temp_row;
-            cin >> temp_row;
+            input_file >> temp_row;
             temp_board.push_back(temp_row);
         }
+
+        input_file.close();
 
         Papan board = Papan(temp_board, N, M);
         vector<Piece> pieces = board.extractPieces();
