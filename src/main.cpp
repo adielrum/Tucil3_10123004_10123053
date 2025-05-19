@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+int N, M, num_piece;
+
 struct Piece {
     int pos_x; // posisi x
     int pos_y; // posisi y
@@ -42,32 +44,68 @@ struct Papan {
     vector<vector<char>> grid;
     
     // init papan
-    Papan(const vector<string>& _grid) {
-        // cari exit:
-        for(unsigned i = 0; i < _grid.size(); i++) {
-            for(unsigned j = 0; j < _grid[i].length(); j++) {
+    Papan(const vector<string>& _grid, int _rows, int _cols) {
+        rows = _rows + 2;
+        cols = _cols + 2;
+
+        // Initialize grid with sentinels
+        grid.resize(rows, vector<char>(cols, '*'));
+
+        // Variables to hold raw K position
+        int raw_exit_x = -1, raw_exit_y = -1;
+
+        // First pass: detect and remove 'K' from _grid clone
+        for (int i = 0; i < _grid.size(); i++) {
+            for (int j = 0; j < _grid[i].length(); j++) {
                 if (_grid[i][j] == 'K') {
-                    exit_x = i + 1;
-                    exit_y = j + 1;
-                    rows = _grid.size();
-                    cols = _grid[i].length() - 1;
+                    raw_exit_x = i;
+                    raw_exit_y = j;
                 }
             }
         }
-        
-        // bangun vector grid dengan data sentinel ("*" di ujung)
-        grid.resize(rows+2, vector<char>(cols+2, '*'));
-        
-        // copy _grid ke grid
-        for(unsigned i = 0; i < _grid.size(); i++) {
-            for(unsigned j = 0; j < _grid[i].length(); j++) {
-                grid[i+1][j+1] = _grid[i][j];
+
+        if (raw_exit_x == 0) {
+            for (int i = 0; i < _grid.size(); i++) {
+                for (int j = 0; j < _grid[i].size(); j++) {
+                    if (j == raw_exit_y) {
+                        if (i == 0) {
+                            continue;
+                        } else {
+                            grid[i][j+1] = _grid[i][j];
+                        }
+                    } else {
+                        grid[i+1][j+1] = _grid[i][j];
+                    }
+                }
             }
+        } else if (raw_exit_y == 0) {
+            for (int i = 0; i < _grid.size(); i++) {
+                for (int j = 0; j < _grid[i].size(); j++) {
+                    if (i == raw_exit_x) {
+                        if (j == 0 ) {
+                            continue;
+                        } else {
+                            grid[i+1][j] = _grid[i][j];
+                        }
+                    } else {
+                        grid[i+1][j+1] = _grid[i][j];
+                    }
+                }
+            }
+            exit_y = raw_exit_y;
+            exit_x = raw_exit_x + 1;
+        } else {
+            for(int i = 0; i < _grid.size(); i++) {
+                for(int j = 0; j < _grid[i].size(); j++) {
+                    grid[i+1][j+1] = _grid[i][j];
+                }
+            }
+            exit_x = raw_exit_x + 1;
+            exit_y = raw_exit_y + 1;
         }
-
         grid[exit_x][exit_y] = '.';
-
     }
+
     
     // Fungsi untuk output grid
     void printGrid() {
@@ -524,7 +562,6 @@ vector<pair<Piece, Move>> AStarEuclidean(const State& initial_state) {
 
 int main()
 {
-    int N, M, num_piece;
     cin >> N >> M >> num_piece;
     vector<string> temp_board;
     for(int i = 0; i < N; i++){
@@ -532,7 +569,7 @@ int main()
         cin >> temp_row;
         temp_board.push_back(temp_row);
     }
-    Papan board = Papan(temp_board);
+    Papan board = Papan(temp_board, N, M);
     // board.movePiece('I',4,4,3,0,-1);
     board.printGrid();
     vector<Piece> pieces = board.extractPieces();

@@ -61,7 +61,16 @@ class RushHourGUI(tk.Tk):
 
         # Initialize grid and draw
         lines = input_data.splitlines()
-        self.grid = [list(row) for row in lines[2:]]
+        # Read raw grid including 'K'
+        raw = [list(row) for row in lines[2:]]
+        # Locate exit 'K' and clear it to '.'
+        self.exit_pos = None
+        for i in range(len(raw)):
+            for j in range(len(raw[0])):
+                if raw[i][j] == 'K':
+                    self.exit_pos = (i, j)
+                    raw[i][j] = '.'
+        self.grid = raw
         self.N = len(self.grid)
         self.M = len(self.grid[0])
 
@@ -78,7 +87,12 @@ class RushHourGUI(tk.Tk):
                 y0 = i * self.cell_size
                 x1 = x0 + self.cell_size
                 y1 = y0 + self.cell_size
-                self.canvas.create_rectangle(x0, y0, x1, y1, outline='black', fill='lightgrey')
+                # highlight exit cell if defined
+                if hasattr(self, 'exit_pos') and self.exit_pos == (i, j):
+                    fill = 'lightgreen'
+                else:
+                    fill = 'lightgrey'
+                self.canvas.create_rectangle(x0, y0, x1, y1, outline='black', fill=fill)(x0, y0, x1, y1, outline='black', fill='lightgrey')
 
     def draw_pieces(self):
         # Clear old piece items
