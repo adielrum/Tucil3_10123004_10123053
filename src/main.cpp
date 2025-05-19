@@ -450,7 +450,50 @@ vector<pair<Piece, Move>> AStarEuclidean(const State& initial_state) {
             }
         }
 
+                
         if (can_exit) {
+            // 1. Figure out how far P must go to exit
+            int tail = (p_piece->ori == 0)
+                ? p_piece->pos_y + p_piece->len - 1
+                : p_piece->pos_x + p_piece->len - 1;
+
+            int dist_to_exit = 0;
+            if (p_piece->ori == 0) {
+                // horizontal
+                if (current.papan.exit_y > tail) {
+                    dist_to_exit = current.papan.exit_y - tail;
+                } else {
+                    // exit to the left
+                    dist_to_exit = p_piece->pos_y - current.papan.exit_y;
+                }
+            } else {
+                // vertical
+                if (current.papan.exit_x > tail) {
+                    dist_to_exit = current.papan.exit_x - tail;
+                } else {
+                    // exit above
+                    dist_to_exit = p_piece->pos_x - current.papan.exit_x;
+                }
+            }
+
+            // 2. Append the final move
+            current.list_moves.emplace_back(*p_piece,
+                Move( (p_piece->ori == 0)
+                    ? (current.papan.exit_y > tail ? "kanan" : "kiri")
+                    : (current.papan.exit_x > tail ? "bawah" : "atas"),
+                    dist_to_exit + 1));
+
+            // 3. (Optional) Update the grid so P actually leaves:
+            //    Remove old P cells:
+            if (p_piece->ori == 0) {
+                for (int j = 0; j < p_piece->len; ++j)
+                    current.papan.grid[p_piece->pos_x][p_piece->pos_y + j] = '.';
+            } else {
+                for (int i = 0; i < p_piece->len; ++i)
+                    current.papan.grid[p_piece->pos_x + i][p_piece->pos_y] = '.';
+            }
+            //    (And you may choose to place it “beyond” the board, or leave it blank.)
+
             cout << "Solution found! Explored " << nodes_explored << " nodes." << endl;
             return current.list_moves;
         }
