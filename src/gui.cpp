@@ -11,27 +11,14 @@ int N, M, num_piece;
 
 int main()
 {
-    while (true) {
-        string file_path;
-        cout << "File path: ";
-        cin >> file_path;
-
-        ifstream input_file(file_path);
-        while (!input_file.is_open()) {
-            cout << "Could not open file! Try again: ";
-            cin >> file_path;
-            ifstream input_file(file_path);
-        }
-
-        int N, M, num_piece;
-        input_file >> N >> M >> num_piece;
+        cin >> N >> M >> num_piece;
 
         bool ketemu_k = false;
         vector<string> temp_board;
 
         for(int i = 0; i < N; i++){
             string temp_row;
-            input_file >> temp_row;
+            cin >> temp_row;
             temp_board.push_back(temp_row);
 
             // ngecek apakah ada 'K'
@@ -44,8 +31,8 @@ int main()
         if (ketemu_k == false) {
             // cout << "masuk sini" << flush;
             string temp_row;
-            input_file.ignore(numeric_limits<streamsize>::max(), '\n'); 
-            getline(input_file, temp_row);
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            getline(cin, temp_row);
             temp_board.push_back(temp_row);
             // cout << temp_row;
         }
@@ -57,7 +44,7 @@ int main()
 
         // cout << board.exit_x << " " << board.exit_y << endl;
 
-        board.printGrid();
+        // board.printGrid();
 
         vector<pair<Piece, Move>> solution = AStar(current_state);
 
@@ -71,6 +58,6 @@ int main()
             cout << "\nNo solution found." << endl;
         }
         cout << "\n"  << endl;
-    }
+
 
 }

@@ -49,6 +49,16 @@ Papan::Papan(const vector<string>& _grid, int _rows, int _cols)
     } 
     
     // Exit at other edges
+    else if (_grid.size() != _rows) {
+        for (int i = 0; i < _grid.size() - 1; i++) {
+            for (int j = 0; j < _grid[i].size(); j++) {
+                grid[i + 1][j + 1] = _grid[i][j];
+            }
+        }
+        exit_x = raw_exit_x + 1;
+        exit_y = raw_exit_y + 1;
+    } 
+    
     else { 
         for (int i = 0; i < _grid.size(); i++) {
             for (int j = 0; j < _grid[i].size(); j++) {
