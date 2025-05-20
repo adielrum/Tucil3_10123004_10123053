@@ -125,7 +125,7 @@ class RushHourGUI(tk.Tk):
         for i in range(self.rows):
             for j in range(self.cols):
                 ch = self.grid[i][j]
-                if ch not in ('.','*'):
+                if ch not in ('.','*',' '):
                     x0, y0 = j*self.cell_size, i*self.cell_size
                     x1, y1 = x0+self.cell_size, y0+self.cell_size
                     fill = 'red' if ch=='P' else 'skyblue'

@@ -14,7 +14,7 @@ struct Papan {
     vector<vector<char>> grid;
 
     // Constructor
-    Papan(const vector<string>& _grid, int _rows, int _cols);
+    Papan(vector<string> _grid, int _rows, int _cols);
 
     // Method
     void printGrid();

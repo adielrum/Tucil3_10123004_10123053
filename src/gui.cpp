@@ -7,35 +7,26 @@
 
 using namespace std;
 
-int N, M, num_piece;
-
 int main()
 {
+        int N, M, num_piece;
         cin >> N >> M >> num_piece;
-
         bool ketemu_k = false;
         vector<string> temp_board;
-
-        for(int i = 0; i < N; i++){
-            string temp_row;
-            cin >> temp_row;
+        string temp_row;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        while(getline(cin, temp_row)){
             temp_board.push_back(temp_row);
-
-            // ngecek apakah ada 'K'
-            for(int j = 0; j < temp_row.length(); j++) {
-                if (temp_row[j] == 'K') ketemu_k = true;
-            }
+            // cout << temp_row << endl;
         }
 
         // kalo belom ada 'K', berarti ada di baris bawah
-        if (ketemu_k == false) {
-            // cout << "masuk sini" << flush;
-            string temp_row;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
-            getline(cin, temp_row);
-            temp_board.push_back(temp_row);
-            // cout << temp_row;
-        }
+        // if (ketemu_k == false) {
+        //     string temp_row;
+        //     input_file.ignore(numeric_limits<streamsize>::max(), '\n');
+        //     getline(input_file, temp_row);
+        //     temp_board.push_back(temp_row);
+        // }
 
         Papan board = Papan(temp_board, N, M);
         vector<Piece> pieces = board.extractPieces();
@@ -44,7 +35,7 @@ int main()
 
         // cout << board.exit_x << " " << board.exit_y << endl;
 
-        // board.printGrid();
+        board.printGrid();
 
         vector<pair<Piece, Move>> solution = AStar(current_state);
 
@@ -58,6 +49,5 @@ int main()
             cout << "\nNo solution found." << endl;
         }
         cout << "\n"  << endl;
-
 
 }
