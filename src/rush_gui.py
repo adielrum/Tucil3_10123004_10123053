@@ -44,43 +44,75 @@ class RushHourGUI(tk.Tk):
         threading.Thread(target=self.run_solver, args=(input_data,)).start()
 
     def run_solver(self, input_data):
-        # Build raw grid from input
+        # 1) Read & sanitize raw lines
         lines = input_data.splitlines()
+        print(lines)
         N, M = map(int, lines[0].split())
-        raw_lines = lines[2:2+N]
-        # detect extra K-row
-        if not any('K' in row for row in raw_lines) and len(lines) > 2+N:
-            raw_lines.append(lines[2+N])
-        # ensure all lines have length M (pad or trim)
-        sanitized = []
-        exit_raw = None
-        for row in raw_lines:
-            if len(row) < M:
-                row = row + '.'*(M-len(row))
-            else:
-                row = row[:M]
+        raw = lines[2:2+N]
+        # if no K found, grab the extra line
+        if all('K' not in row for row in raw) and len(lines) > 2+N:
+            raw.append(lines[2+N])
+
+        # 2) Locate raw K cell and detect empty‐row condition
+        raw_exit_x = raw_exit_y = None
+        empty_row = False
+        for i, row in enumerate(raw):
             if 'K' in row:
-                exit_raw = (len(sanitized), row.index('K'))
-            sanitized.append(row.replace('K', '.'))
-        # raw matrix
-        self.raw = [list(r) for r in sanitized]
-        H, W = len(self.raw), len(self.raw[0])
-        # Build padded grid uniformly
+                raw_exit_x, raw_exit_y = i, row.index('K')
+                # check if every other character is space (or '.') 
+                if all((j==raw_exit_y) or (c in ' .') for j,c in enumerate(row)):
+                    empty_row = True
+                break
+
+        # 3) If it was an empty row, delete it
+        if empty_row and raw_exit_x in (0, len(raw)-1):
+            del raw[raw_exit_x]
+            # adjust raw_exit_x if it was the bottom row
+            if raw_exit_x == len(raw):
+                raw_exit_x = None  # will reset below
+
+        # 4) Build sanitized grid (replace K with '.')
+        sanitized = [ (r.replace('K','.') + '.'*M)[:M] for r in raw ]
+        print(sanitized)
+        # 5) Compute padded exit_x,exit_y
+        # after deletion, raw_exit_x may have changed if bottom
+        if raw_exit_x is None:
+            # bottom‐edge exit: now at deleted‐row index
+            raw_exit_x = len(sanitized)
+        # four edge cases:
+        if raw_exit_x == 0 and empty_row:
+            # top edge
+            exit_x, exit_y = 0, raw_exit_y+1
+        elif raw_exit_x == len(sanitized) and empty_row:
+            # bottom edge
+            exit_x, exit_y = raw_exit_x+1, raw_exit_y+1
+        elif raw_exit_y == 0:
+            # left edge
+            exit_x, exit_y = raw_exit_x+1, 0
+        elif raw_exit_y == M-1:
+            # right edge
+            exit_x, exit_y = raw_exit_x+1, raw_exit_y+1
+        else:
+            # interior K (shouldn’t happen)
+            exit_x = raw_exit_x+1
+            exit_y = raw_exit_y+1
+
+        # 6) Build the padded grid with sentinels
+        H = len(sanitized)
+        W = M
         padded = [['*']*(W+2) for _ in range(H+2)]
         for i in range(H):
             for j in range(W):
-                padded[i+1][j+1] = self.raw[i][j]
-        # record exit in padded coords
-        if exit_raw:
-            ei, ej = exit_raw
-            self.exit_pos = (ei+1, ej+1)
-        else:
-            self.exit_pos = None
+                padded[i+1][j+1] = sanitized[i][j]
+
+        # 7) Overwrite the exit cell to '.' so we can slide through
+        padded[exit_x][exit_y] = '.'
+
+        # Save into self
+        self.raw = [list(r) for r in sanitized]
         self.grid = padded
-        self.rows = len(self.grid)
-        self.cols = len(self.grid[0])
-        self.rows = len(self.grid)
-        self.cols = len(self.grid[0])
+        self.rows, self.cols = H+2, W+2
+        self.exit_pos = (exit_x, exit_y)
 
         # Run executable to get moves
         base_dir = os.path.dirname(__file__)

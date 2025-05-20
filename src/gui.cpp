@@ -3,42 +3,40 @@
 #include "move.h"
 #include "papan.h"
 #include "state.h"
-#include "algorithm.h"
+#include "solver.h"
 
 using namespace std;
+
+int N, M, num_piece;
 
 int main()
 {
         int N, M, num_piece;
         cin >> N >> M >> num_piece;
+
         bool ketemu_k = false;
         vector<string> temp_board;
+
         string temp_row;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         while(getline(cin, temp_row)){
             temp_board.push_back(temp_row);
-            // cout << temp_row << endl;
         }
 
-        // kalo belom ada 'K', berarti ada di baris bawah
-        // if (ketemu_k == false) {
-        //     string temp_row;
-        //     input_file.ignore(numeric_limits<streamsize>::max(), '\n');
-        //     getline(input_file, temp_row);
-        //     temp_board.push_back(temp_row);
-        // }
-
         Papan board = Papan(temp_board, N, M);
+        if (!board.is_valid) {
+            cout << "Papan tidak valid. Coba lagi.\n";
+        }
         vector<Piece> pieces = board.extractPieces();
         vector<pair<Piece, Move>> moves;
         State current_state(board, moves, pieces, 0);
 
-        // cout << board.exit_x << " " << board.exit_y << endl;
-
-        board.printGrid();
-
-        vector<pair<Piece, Move>> solution = AStar(current_state);
-
+        // Solve papan 
+        string algoritma_type = "2";
+        Solver boardSolver = Solver(stoi(algoritma_type));
+        vector<pair<Piece, Move>> solution = boardSolver.solveBoard(current_state);
+        cout << endl;
+        
         if (!solution.empty()) {
             for (size_t i = 0; i < solution.size(); i++) {
                 cout << "Move " << (i+1) << ": ";
@@ -49,5 +47,4 @@ int main()
             cout << "\nNo solution found." << endl;
         }
         cout << "\n"  << endl;
-
 }
