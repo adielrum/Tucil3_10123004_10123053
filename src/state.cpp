@@ -80,7 +80,6 @@ void State::printAllMoves() {
    }
 }
 
-// Apply move to state of papan
 State State::applyMove(const pair<Piece, Move>& action) const {
    Piece target = action.first;
    Move move     = action.second;
