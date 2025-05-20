@@ -80,61 +80,74 @@ void State::printAllMoves() {
    }
 }
 
-// Apply move to state of papan
 State State::applyMove(const pair<Piece, Move>& action) const {
-   Piece target = action.first; // piece
-   Move move = action.second; // movement
+    Piece target = action.first;
+    Move move     = action.second;
 
-   // Duplicate fields 
-   vector<pair<Piece, Move>> current_moves = this->list_moves;
-   vector<Piece> new_pieces = this->pieces;
-   Papan new_papan = this->papan;
+    // Copy current state
+    vector<pair<Piece, Move>> current_moves = this->list_moves;
+    vector<Piece>            new_pieces    = this->pieces;
+    Papan                     new_papan     = this->papan;
 
-   // Find dan update piece
-   for (Piece& p : new_pieces) {
-      if (p.name == target.name) {
+    // Find & update the moved piece
+    for (Piece& p : new_pieces) {
+        if (p.name != target.name) continue;
 
-         // 1. Lift piece from papan
-         if (p.ori == 0) { // horizontal
-               for (int j = 0; j < p.len; ++j) {
-                  new_papan.grid[p.pos_x][p.pos_y + j] = '.';
-               }
-         } else { // vertical
-               for (int i = 0; i < p.len; ++i) {
-                  new_papan.grid[p.pos_x + i][p.pos_y] = '.';
-               }
-         }
+        // 1) Erase from its old cells
+        if (p.ori == 0) {  // horizontal
+            for (int j = 0; j < p.len; ++j)
+                new_papan.grid[p.pos_x][p.pos_y + j] = '.';
+        } else {          // vertical
+            for (int i = 0; i < p.len; ++i)
+                new_papan.grid[p.pos_x + i][p.pos_y] = '.';
+        }
 
-         // 2. Update piece position
-         if (move.arah == "kiri") {
-               p.pos_y -= move.dist;
-         } else if (move.arah == "kanan") {
-               p.pos_y += move.dist;
-         } else if (move.arah == "atas") {
-               p.pos_x -= move.dist;
-         } else if (move.arah == "bawah") {
-               p.pos_x += move.dist;
-         }
+        // 2) Update its coords
+        if      (move.arah == "kiri")  p.pos_y -= move.dist;
+        else if (move.arah == "kanan") p.pos_y += move.dist;
+        else if (move.arah == "atas")  p.pos_x -= move.dist;
+        else if (move.arah == "bawah") p.pos_x += move.dist;
 
-         // 3. Replace piece on papan
-         if (p.ori == 0) { // horizontal
-               for (int j = 0; j < p.len; ++j) {
-                  new_papan.grid[p.pos_x][p.pos_y + j] = p.name;
-               }
-         } else { // vertical
-               for (int i = 0; i < p.len; ++i) {
-                  new_papan.grid[p.pos_x + i][p.pos_y] = p.name;
-               }
-         }
-         
-         current_moves.push_back({p, action.second});
+        // 3) Detect exit move (only for 'P')
+        bool isExitMove = false;
+        if (p.name == 'P') {
+            int head_x = p.pos_x;
+            int head_y = p.pos_y;
+            int tail_x = (p.ori == 0) ? p.pos_x : p.pos_x + p.len - 1;
+            int tail_y = (p.ori == 0) ? p.pos_y + p.len - 1 : p.pos_y;
 
-         break;
-      }
-   }
+            int ex = new_papan.exit_x;
+            int ey = new_papan.exit_y;
 
-   // Return new state
-   return State(new_papan, current_moves, new_pieces, this->depth + 1);
+            // Horizontal exit:
+            if (p.ori == 0 && head_x == ex) {
+                if (move.arah == "kanan" && tail_y >= ey) isExitMove = true;
+                if (move.arah == "kiri"  && head_y <= ey) isExitMove = true;
+            }
+            // Vertical exit:
+            else if (p.ori == 1 && head_y == ey) {
+                if (move.arah == "bawah" && tail_x >= ex) isExitMove = true;
+                if (move.arah == "atas"   && head_x <= ex) isExitMove = true;
+            }
+        }
+
+        // 4) Redraw unless it's the exit move
+        if (!isExitMove) {
+            if (p.ori == 0) {
+                for (int j = 0; j < p.len; ++j)
+                    new_papan.grid[p.pos_x][p.pos_y + j] = p.name;
+            } else {
+                for (int i = 0; i < p.len; ++i)
+                    new_papan.grid[p.pos_x + i][p.pos_y] = p.name;
+            }
+        }
+
+        // 5) Record the move
+        current_moves.emplace_back(p, move);
+        break;
+    }
+
+    return State(new_papan, current_moves, new_pieces, this->depth + 1);
 }
 
 // Heuristic 1: Compute distance between primary piece and exit cell

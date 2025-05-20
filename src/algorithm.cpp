@@ -153,7 +153,7 @@ vector<pair<Piece, Move>> solveBoard(const State& initial_state) {
                (p_piece->ori == 0) 
                   ? (current.papan.exit_y > tail ? "kanan" : "kiri") 
                   : (current.papan.exit_x > tail ? "bawah" : "atas"),
-               dist_to_exit + 1
+               dist_to_exit + p_piece->len
             )
          );
 
