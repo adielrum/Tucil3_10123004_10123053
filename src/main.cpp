@@ -3,16 +3,27 @@
 #include "move.h"
 #include "papan.h"
 #include "state.h"
-#include "algorithm.h"
+#include "solver.h"
 
 using namespace std;
 using namespace chrono;
 
 int main()
 {
-    cout << endl;
+    cout << "\n=========================================================================================" << endl;
+    cout << R"(
+    _____           _       _    _                     _____       _                
+    |  __ \         | |     | |  | |                   / ____|     | |               
+    | |__) |   _ ___| |__   | |__| | ___  _   _ _ __  | (___   ___ | |_   _____ _ __ 
+    |  _  / | | / __| '_ \  |  __  |/ _ \| | | | '__|  \___ \ / _ \| \ \ / / _ \ '__|
+    | | \ \ |_| \__ \ | | | | |  | | (_) | |_| | |     ____) | (_) | |\ V /  __/ |   
+    |_|  \_\__,_|___/_| |_| |_|  |_|\___/ \__,_|_|    |_____/ \___/|_| \_/ \___|_|   
+    )" << endl;
+    
 
     while (true) {
+
+        cout << "=========================================================================================\n" << endl;
 
         // Input file
         string file_path;
@@ -45,18 +56,30 @@ int main()
             cout << "Papan tidak valid. Coba lagi.\n";
             continue;
         }
-        cout << "Papan Awal" << endl;
-        board.printGrid();
-        cout << endl;
+
+        // Input algoritma
+        string algoritma_type;
+        cout << "Berikut beberapa algoritam pathfinding." << endl;
+        cout << "  0. Uniform Cost Search (UCS)" << endl;
+        cout << "  1. Greedy Best First Search" << endl;
+        cout << "  2. A* Search" << endl;
+        cout << "Pilih algoritma (0,1,2): ";
+        getline(cin, algoritma_type); 
 
         // State awal
+        cout << "\nPapan Awal" << endl;
+        board.printGrid();
+        cout << endl;
         vector<Piece> pieces = board.extractPieces();
         vector<pair<Piece, Move>> moves;
         State current_state(board, moves, pieces, 0);
 
         // Solve papan 
+        Solver boardSolver = Solver(stoi(algoritma_type));
         auto start = high_resolution_clock::now();
-        vector<pair<Piece, Move>> solution = solveBoard(current_state);
+        vector<pair<Piece, Move>> solution = boardSolver.solveBoard(current_state);
+
+        // Count time
         auto end = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(end - start);
         double time = duration.count() / 1000.0;
@@ -66,20 +89,20 @@ int main()
         if (!solution.empty()) {
             for (size_t i = 0; i < solution.size(); i++) {
                 
+                pair<Piece, Move> frame = solution[i];
+
                 // Print move information
                 cout << "Gerakan " << (i+1) << ": ";
-                cout << "Pindah piece " << solution[i].first.name << " ke ";
-                cout << solution[i].second.arah << " " << solution[i].second.dist << " langkah." << endl;
+                cout << "Pindah piece " << frame.first.name << " ke ";
+                cout << frame.second.arah << " " << frame.second.dist << " langkah." << endl;
 
                 // Print new state
                 current_state = current_state.applyMove(solution[i]);
                 current_state.papan.printGrid(solution[i].first.name);
                 cout << endl;
             }
-        } else {
-            cout << "\nNo solution found." << endl;
-        }
-        cout << "\n"  << endl;
+        } 
+
     }
 
 }

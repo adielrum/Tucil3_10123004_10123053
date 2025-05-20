@@ -1,41 +1,69 @@
 #include <bits/stdc++.h>
-#include "algorithm.h"
+#include "solver.h"
+
+// Constructor
+Solver::Solver(int _type)
+   : type(_type) {}
 
 // Convert grid to string 
-string gridToString(const vector<vector<char>>& grid) {
-    string result;
-    // Skip the sentinel border (first and last rows/columns)
-    for (size_t i = 1; i < grid.size() - 1; i++) {
-        for (size_t j = 1; j < grid[i].size() - 1; j++) {
-            result.push_back(grid[i][j]);
-        }
-    }
-    return result;
+string Solver::gridToString(const vector<vector<char>>& grid) {
+   string result;
+
+   // Skip the sentinel border (first and last rows/columns)
+   for (size_t i = 1; i < grid.size() - 1; i++) {
+      for (size_t j = 1; j < grid[i].size() - 1; j++) {
+         result.push_back(grid[i][j]);
+      }
+   }
+
+   return result;
 }
 
-// A* Search Algorithm 
-vector<pair<Piece, Move>> solveBoard(const State& initial_state) {
+// Convert algorithm type to parameter toggle 
+pair<int, int> Solver::toggleType(int type) {
+   
+   // UCS 
+   if (type == 0) {
+      return {1,0};
+   }
+
+   // Greedy
+   else if (type == 1) {
+      return {0,1};
+   }
+   
+   // A*
+   else {
+      return {1,1};
+   }
+
+}
+
+// Solve the board with specified algorithm
+vector<pair<Piece, Move>> Solver::solveBoard(const State& initial_state) {
    int nodes_explored = 0;
    
    // Create priority queue 
-   auto compare = [](const pair<double, State>& a, const pair<double, State>& b) {
+   auto compare = [](const pair<int, State>& a, const pair<int, State>& b) {
       return a.first > b.first;  // Lower cost has higher priority
    };
-   priority_queue<pair<double, State>, vector<pair<double, State>>, decltype(compare)> pq(compare);
+   priority_queue<pair<int, State>, vector<pair<int, State>>, decltype(compare)> pq(compare);
    
-   // Visited states
+   // Initialize visited states array
    unordered_set<string> visited;
    
+   // Calculate initial cost: f(0) = g(0) + h(0) 
+   pair<int, int> params = toggleType(type);
+   int initial_cost = initial_state.depth * params.first + initial_state.computeBlocks() * params.second;
+
    // Push initial state
-   double initial_cost = 1.0 * initial_state.depth + initial_state.computeBlocks();
    pq.push({initial_cost, initial_state});
    
-   // Loop through queue
+   // Loop through priority queue 
    while (!pq.empty()) {
 
       // Get state with lowest cost
       State current = pq.top().second;
-      double test = pq.top().first;
       pq.pop();
       
       // Skip state if already visited 
@@ -53,11 +81,6 @@ vector<pair<Piece, Move>> solveBoard(const State& initial_state) {
             p_piece = const_cast<Piece*>(&p);
             break;
          }
-      }
-      
-      if (!p_piece) {
-         cout << "Error: P piece not found!" << endl;
-         continue;
       }
       
       // Check if goal state is reached (primary piece can exit)
@@ -153,18 +176,9 @@ vector<pair<Piece, Move>> solveBoard(const State& initial_state) {
                (p_piece->ori == 0) 
                   ? (current.papan.exit_y > tail ? "kanan" : "kiri") 
                   : (current.papan.exit_x > tail ? "bawah" : "atas"),
-               dist_to_exit + 1
+               dist_to_exit + p_piece->len
             )
          );
-
-         // 3. Update the grid so P actually leaves:
-         if (p_piece->ori == 0) {
-            for (int j = 0; j < p_piece->len; ++j)
-               current.papan.grid[p_piece->pos_x][p_piece->pos_y + j] = '.';
-         } else {
-            for (int i = 0; i < p_piece->len; ++i)
-               current.papan.grid[p_piece->pos_x + i][p_piece->pos_y] = '.';
-         }
 
          cout << "Solusi ditemukan!" << endl;
          cout << "Dikunjungi " << nodes_explored << " simpul dalam ";
@@ -174,6 +188,7 @@ vector<pair<Piece, Move>> solveBoard(const State& initial_state) {
       // Generate all possible next states
       vector<pair<Piece, Move>> possible_moves = current.getAllPossibleMoves();
       for (const auto& move : possible_moves) {
+
          // Create new state by applying the move
          State next_state = current.applyMove(move);
          
@@ -182,10 +197,11 @@ vector<pair<Piece, Move>> solveBoard(const State& initial_state) {
          if (visited.count(next_grid_str)) continue;
          
          // Calculate cost: f(n) = g(n) + h(n) 
-         double cost = next_state.depth + next_state.computeBlocks();
+         int cost = next_state.depth * params.first + next_state.computeBlocks() * params.second;
          
          // Add to priority queue
          pq.push({cost, next_state});
+         
       }
    }
    
