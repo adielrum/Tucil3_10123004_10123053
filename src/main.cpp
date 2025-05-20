@@ -69,18 +69,18 @@ int main()
 
         // Input algoritma
         string algoritma_type;
-        do {
-            cout << "Berikut beberapa algoritam pathfinding." << endl;
-            cout << "  0. Uniform Cost Search (UCS)" << endl;
-            cout << "  1. Greedy Best First Search" << endl;
-            cout << "  2. A* Search" << endl;
-            cout << "Pilih algoritma (0,1,2): ";
-            getline(cin, algoritma_type); 
-            if (!isInteger(algoritma_type) || !(stoi(algoritma_type) >= 0 && stoi(algoritma_type) <= 2)) {
-                cout << "\nAngka tidak valid. Coba lagi. ";
+        cout << "Berikut beberapa algoritam pathfinding." << endl;
+        cout << "  0. Uniform Cost Search (UCS)" << endl;
+        cout << "  1. Greedy Best First Search" << endl;
+        cout << "  2. A* Search" << endl;
+        cout << "Pilih algoritma (0,1,2): ";
+        while(getline(cin, algoritma_type)) {
+            if (algoritma_type == "0" || algoritma_type == "1" || algoritma_type == "2") {
+                break;
             }
-        } while (!isInteger(algoritma_type) || !(stoi(algoritma_type) >= 0 && stoi(algoritma_type) <= 2));
-
+            cout << "Pilihan algoritma tidak valid!" << endl;
+            cout << "Pilih algoritma (0,1,2): ";
+        }
         // State awal
         cout << "\nPapan Awal" << endl;
         board.printGrid();
