@@ -30,6 +30,7 @@ struct State {
    State applyMove(const pair<Piece, Move>& action) const;
    int computeDistance() const; 
    int computeBlocks() const;
+   int computeDoubleBlocks() const;
    double computeEuclideanDistance() const;
 
 };

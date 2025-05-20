@@ -69,7 +69,7 @@ int main()
 
         // Input algoritma
         string algoritma_type;
-        cout << "Berikut beberapa algoritam pathfinding." << endl;
+        cout << "Berikut beberapa algoritma pathfinding." << endl;
         cout << "  0. Uniform Cost Search (UCS)" << endl;
         cout << "  1. Greedy Best First Search" << endl;
         cout << "  2. A* Search" << endl;
@@ -81,6 +81,7 @@ int main()
             cout << "\nAngka tidak valid. Coba lagi. " << endl;
             cout << "Pilih algoritma (0,1,2): ";
         }
+
         // State awal
         cout << "\nPapan Awal" << endl;
         board.printGrid();
