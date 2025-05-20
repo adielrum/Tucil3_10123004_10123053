@@ -11,6 +11,7 @@ struct Papan {
     int cols;
     int exit_x;
     int exit_y;
+    bool is_valid;
     vector<vector<char>> grid;
 
     // Constructor

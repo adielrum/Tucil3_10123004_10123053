@@ -1,0 +1,9 @@
+6 6
+9
+AABB..
+..C.DD
+P.C.FF
+PE..I.
+.E..IG
+HHHHIG
+K

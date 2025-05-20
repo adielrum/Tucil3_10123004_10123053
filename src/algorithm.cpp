@@ -14,7 +14,7 @@ string gridToString(const vector<vector<char>>& grid) {
 }
 
 // A* Search Algorithm 
-vector<pair<Piece, Move>> AStar(const State& initial_state) {
+vector<pair<Piece, Move>> solveBoard(const State& initial_state) {
    int nodes_explored = 0;
    
    // Create priority queue 
@@ -189,6 +189,7 @@ vector<pair<Piece, Move>> AStar(const State& initial_state) {
       }
    }
    
-   cout << "No solution found after exploring " << nodes_explored << " nodes." << endl;
+   cout << "Solusi tidak ditemukan." << endl;
+   cout << "Dikunjungi " << nodes_explored << " simpul dalam ";
    return {};  // No solution found
 }

@@ -8,9 +8,9 @@
 #include "state.h"
 
 // Helpers
-std::string gridToString(const std::vector<std::vector<char>>& grid);
+string gridToString(const vector<vector<char>>& grid);
 
 // Algorithms
-std::vector<std::pair<Piece, Move>> AStar(const State& initial_state);
+vector<pair<Piece, Move>> solveBoard(const State& initial_state);
 
 #endif

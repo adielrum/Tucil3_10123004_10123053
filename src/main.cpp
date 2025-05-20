@@ -10,16 +10,21 @@ using namespace chrono;
 
 int main()
 {
+    cout << endl;
+
     while (true) {
 
         // Input file
         string file_path;
         ifstream input_file(file_path);
         do {
-            cout << "File path: ";
+            cout << "Masukan file (.txt): ";
             getline(cin, file_path); 
             input_file.close(); 
             input_file.open(file_path);
+            if (!input_file.is_open()) {
+                cout << "\nFile tidak bisa dibuka. Coba lagi. \n";
+            }
         } while (!input_file.is_open());
         cout << endl;
 
@@ -36,18 +41,22 @@ int main()
 
         // Create papan 
         Papan board = Papan(temp_board, N, M);
-        vector<Piece> pieces = board.extractPieces();
-        vector<pair<Piece, Move>> moves;
-        State current_state(board, moves, pieces, 0);
-
-        // Papan awal
+        if (!board.is_valid) {
+            cout << "Papan tidak valid. Coba lagi.\n";
+            continue;
+        }
         cout << "Papan Awal" << endl;
         board.printGrid();
         cout << endl;
 
+        // State awal
+        vector<Piece> pieces = board.extractPieces();
+        vector<pair<Piece, Move>> moves;
+        State current_state(board, moves, pieces, 0);
+
         // Solve papan 
         auto start = high_resolution_clock::now();
-        vector<pair<Piece, Move>> solution = AStar(current_state);
+        vector<pair<Piece, Move>> solution = solveBoard(current_state);
         auto end = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(end - start);
         double time = duration.count() / 1000.0;
