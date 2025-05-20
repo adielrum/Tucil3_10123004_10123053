@@ -78,7 +78,7 @@ int main()
             if (algoritma_type == "0" || algoritma_type == "1" || algoritma_type == "2") {
                 break;
             }
-            cout << "Pilihan algoritma tidak valid!" << endl;
+            cout << "\nAngka tidak valid. Coba lagi. " << endl;
             cout << "Pilih algoritma (0,1,2): ";
         }
         // State awal
