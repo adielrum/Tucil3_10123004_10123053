@@ -166,7 +166,8 @@ vector<pair<Piece, Move>> AStar(const State& initial_state) {
                current.papan.grid[p_piece->pos_x + i][p_piece->pos_y] = '.';
          }
 
-         cout << "Solution found! Explored " << nodes_explored << " nodes." << endl;
+         cout << "Solusi ditemukan!" << endl;
+         cout << "Dikunjungi " << nodes_explored << " simpul dalam ";
          return current.list_moves;
       }
       

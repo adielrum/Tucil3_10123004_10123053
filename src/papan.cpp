@@ -3,29 +3,27 @@
 // Konstruktor
 Papan::Papan(vector<string> _grid, int _rows, int _cols)
     : rows(_rows + 2), cols(_cols + 2), exit_x(0), exit_y(0) {
-    cout << "---------------Awal-------------------" << endl;
-    for(auto s : _grid){
-        cout << s << endl; 
-    }
-    cout << "---------------Awal-------------------" << endl;
+    
     // Initialize grid with sentinels 
     grid.resize(rows, vector<char>(cols, '*'));
     
     // Find position of exit cell (K)
     int raw_exit_x = -1, raw_exit_y = -1;
     int row_delete = -1;
+
     for (int i = 0; i < _grid.size(); i++) {
+
+        // Locate exit cell 
         size_t pos = _grid[i].find('K');
-        // cout << pos << endl;
         if (pos != std::string::npos) {
-            // pos menyatakan indeks k;
+
+            // Save exit cell coordinates
             raw_exit_x = i;  
             raw_exit_y = static_cast<int>(pos); 
             
+            // Erase exit cell 
             _grid[i].erase(pos, 1);  
-            cout << _grid[i] << endl;
-
-            if ((i == 0 || i == _rows + 1)) {
+            if (i == 0 || i == _rows + 1) {
                 row_delete = i;
             }
 
@@ -44,16 +42,11 @@ Papan::Papan(vector<string> _grid, int _rows, int _cols)
             break;
         }
     }
+
+    // Remove exit row if necessary
     if (row_delete != -1) {
         _grid.erase(_grid.begin() + row_delete);
     }
-    cout << "---------------Hasil-------------------" << endl;
-    for(auto s : _grid){
-        cout << s << endl; 
-    }
-    cout << "---------------Hasil-------------------" << endl;
-    // rows = _grid.size();
-    // cols = _grid[0].size();
 
     // Copy grid to papan
     for(int i = 0; i < _rows; i++) {
@@ -62,73 +55,25 @@ Papan::Papan(vector<string> _grid, int _rows, int _cols)
         }
     }
 
-    for(auto s : grid) {
-        for(auto a : s) {
-            cout << a << " ";
-        }
-        cout << endl;
-    }
-
-    // Exit at first row
-    // if (raw_exit_x == 0) { 
-    //     for (int i = 0; i < _grid.size(); i++) {
-    //         for (int j = 0; j < _grid[i].size(); j++) {
-    //             if (j == raw_exit_y) {
-    //                 if (i == 0) continue;
-    //                 grid[i][j + 1] = _grid[i][j];
-    //             } else {
-    //                 grid[i + 1][j + 1] = _grid[i][j];
-    //             }
-    //         }
-    //     }
-    // } 
-    
-    // // Exit at first column
-    // else if (raw_exit_y == 0) { 
-    //     for (int i = 0; i < _grid.size(); i++) {
-    //         for (int j = 0; j < _grid[i].size(); j++) {
-    //             if (i == raw_exit_x && j == 0) continue;
-    //             if (i == raw_exit_x) {
-    //                 grid[i + 1][j] = _grid[i][j];
-    //             } else {
-    //                 grid[i + 1][j + 1] = _grid[i][j];
-    //             }
-    //         }
-    //     }
-    //     exit_y = raw_exit_y;
-    //     exit_x = raw_exit_x + 1;
-    // } 
-    
-    // // Exit at other edges
-    // else if (_grid.size() != _rows) {
-    //     for (int i = 0; i < _grid.size() - 1; i++) {
-    //         for (int j = 0; j < _grid[i].size(); j++) {
-    //             grid[i + 1][j + 1] = _grid[i][j];
-    //         }
-    //     }
-    //     exit_x = raw_exit_x + 1;
-    //     exit_y = raw_exit_y + 1;
-    // } 
-    
-    // else { 
-    //     for (int i = 0; i < _grid.size(); i++) {
-    //         for (int j = 0; j < _grid[i].size(); j++) {
-    //             grid[i + 1][j + 1] = _grid[i][j];
-    //         }
-    //     }
-    //     exit_x = raw_exit_x + 1;
-    //     exit_y = raw_exit_y + 1;
-    // }
-
     // Open exit cell
-    grid[exit_x][exit_y] = '.';
+    grid[exit_x][exit_y] = 'K';
 }
 
 // Display papan
-void Papan::printGrid() {
+void Papan::printGrid(char s) {
     for (const auto& row : grid) {
         for (char c : row) {
-            cout << c << ' ';
+            if (c == s) {
+                cout << "\033[43m" << c << "\033[0m ";
+            } else if (c == 'P') {
+                cout << "\033[1;31m" << c << "\033[0m ";
+            } else if (c == 'K') {
+                cout << "\033[1;32m" << c << "\033[0m ";
+            } else if (c == '*') {
+                cout << "\033[1;37m" << c << "\033[0m ";
+            } else {
+                cout << c << "\033[0m ";
+            }
         }
         cout << '\n';
     }

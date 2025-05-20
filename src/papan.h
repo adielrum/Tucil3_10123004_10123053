@@ -17,7 +17,7 @@ struct Papan {
     Papan(vector<string> _grid, int _rows, int _cols);
 
     // Method
-    void printGrid();
+    void printGrid(char s = '-');
     vector<Piece> extractPieces();
 };
 

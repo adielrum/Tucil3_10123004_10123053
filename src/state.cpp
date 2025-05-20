@@ -211,35 +211,3 @@ double State::computeEuclideanDistance() const {
    double dy = py - ky;
    return sqrt(dx * dx + dy * dy);
 }
-
-/*
-// Manhattan distance calculation
-double State::computeManhattanDistance() {
-   vector<vector<char>> grid = papan.grid;
-   vector<pair<int, int>> p_positions;
-   pair<int, int> k_position = {-1, -1};
-
-   for (int i = 0; i < (int)grid.size(); i++) {
-      for (int j = 0; j < (int)grid[i].size(); j++) {
-         if (grid[i][j] == 'P') {
-            p_positions.push_back({i, j});
-         } else if (grid[i][j] == 'K') {
-            k_position = {i, j};
-         }
-      }
-   }
-
-   double px = 0, py = 0;
-   for (const auto& pos : p_positions) {
-      px += pos.first;
-      py += pos.second;
-   }
-   px /= p_positions.size();
-   py /= p_positions.size();
-
-   int center_px = round(px);
-   int center_py = round(py);
-
-   return abs(center_px - k_position.first) + abs(center_py - k_position.second);
-}
-*/
