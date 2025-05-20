@@ -8,6 +8,18 @@
 using namespace std;
 using namespace chrono;
 
+bool isInteger(const string& s) {
+    try {
+        size_t idx;
+        stoi(s, &idx);
+        return idx == s.size(); // ensure whole string was consumed
+    } catch (invalid_argument& e) {
+        return false;
+    } catch (out_of_range& e) {
+        return false;
+    }
+}
+
 int main()
 {
     cout << "\n=========================================================================================" << endl;
@@ -19,10 +31,9 @@ int main()
     | | \ \ |_| \__ \ | | | | |  | | (_) | |_| | |     ____) | (_) | |\ V /  __/ |   
     |_|  \_\__,_|___/_| |_| |_|  |_|\___/ \__,_|_|    |_____/ \___/|_| \_/ \___|_|   
     )" << endl;
+    cout << "=========================================================================================\n" << endl;
 
     while (true) {
-
-        cout << "=========================================================================================\n" << endl;
 
         // Input file
         string file_path;
@@ -58,12 +69,17 @@ int main()
 
         // Input algoritma
         string algoritma_type;
-        cout << "Berikut beberapa algoritam pathfinding." << endl;
-        cout << "  0. Uniform Cost Search (UCS)" << endl;
-        cout << "  1. Greedy Best First Search" << endl;
-        cout << "  2. A* Search" << endl;
-        cout << "Pilih algoritma (0,1,2): ";
-        getline(cin, algoritma_type); 
+        do {
+            cout << "Berikut beberapa algoritam pathfinding." << endl;
+            cout << "  0. Uniform Cost Search (UCS)" << endl;
+            cout << "  1. Greedy Best First Search" << endl;
+            cout << "  2. A* Search" << endl;
+            cout << "Pilih algoritma (0,1,2): ";
+            getline(cin, algoritma_type); 
+            if (!isInteger(algoritma_type) || !(stoi(algoritma_type) >= 0 && stoi(algoritma_type) <= 2)) {
+                cout << "\nAngka tidak valid. Coba lagi. ";
+            }
+        } while (!isInteger(algoritma_type) || !(stoi(algoritma_type) >= 0 && stoi(algoritma_type) <= 2));
 
         // State awal
         cout << "\nPapan Awal" << endl;
@@ -101,6 +117,8 @@ int main()
                 cout << endl;
             }
         } 
+
+        cout << "=========================================================================================\n" << endl;
 
     }
 
