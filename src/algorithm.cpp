@@ -157,15 +157,6 @@ vector<pair<Piece, Move>> solveBoard(const State& initial_state) {
             )
          );
 
-         // 3. Update the grid so P actually leaves:
-         if (p_piece->ori == 0) {
-            for (int j = 0; j < p_piece->len; ++j)
-               current.papan.grid[p_piece->pos_x][p_piece->pos_y + j] = '.';
-         } else {
-            for (int i = 0; i < p_piece->len; ++i)
-               current.papan.grid[p_piece->pos_x + i][p_piece->pos_y] = '.';
-         }
-
          cout << "Solusi ditemukan!" << endl;
          cout << "Dikunjungi " << nodes_explored << " simpul dalam ";
          return current.list_moves;

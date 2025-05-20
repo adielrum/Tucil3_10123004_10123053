@@ -108,28 +108,53 @@ State State::applyMove(const pair<Piece, Move>& action) const {
         else if (move.arah == "atas")  p.pos_x -= move.dist;
         else if (move.arah == "bawah") p.pos_x += move.dist;
 
-        // 3) Detect exit move (only for 'P')
-        bool isExitMove = false;
-        if (p.name == 'P') {
-            int head_x = p.pos_x;
-            int head_y = p.pos_y;
-            int tail_x = (p.ori == 0) ? p.pos_x : p.pos_x + p.len - 1;
-            int tail_y = (p.ori == 0) ? p.pos_y + p.len - 1 : p.pos_y;
+      // 3) Detect exit move (only for 'P'), using original piece to find exit side:
+      bool isExitMove = false;
+      if (p.name == 'P') {
+         // original piece before move:
+         const Piece& orig = action.first;
+         int o_head_x = orig.pos_x;
+         int o_head_y = orig.pos_y;
+         int o_tail_x = orig.pos_x + (orig.ori == 1 ? orig.len - 1 : 0);
+         int o_tail_y = orig.pos_y + (orig.ori == 0 ? orig.len - 1 : 0);
 
-            int ex = new_papan.exit_x;
-            int ey = new_papan.exit_y;
+         int ex = new_papan.exit_x;
+         int ey = new_papan.exit_y;
 
-            // Horizontal exit:
-            if (p.ori == 0 && head_x == ex) {
-                if (move.arah == "kanan" && tail_y >= ey) isExitMove = true;
-                if (move.arah == "kiri"  && head_y <= ey) isExitMove = true;
-            }
-            // Vertical exit:
-            else if (p.ori == 1 && head_y == ey) {
-                if (move.arah == "bawah" && tail_x >= ex) isExitMove = true;
-                if (move.arah == "atas"   && head_x <= ex) isExitMove = true;
-            }
-        }
+         // decide exit direction once:
+         enum { RIGHT, LEFT, DOWN, UP, NONE } exitDir = NONE;
+         if (orig.ori == 0 && o_head_x == ex) {
+            if (ey > o_tail_y) exitDir = RIGHT;
+            else if (ey < o_head_y) exitDir = LEFT;
+         }
+         else if (orig.ori == 1 && o_head_y == ey) {
+            if (ex > o_tail_x) exitDir = DOWN;
+            else if (ex < o_head_x) exitDir = UP;
+         }
+
+         // now see if this move matches that direction & crosses the exit
+         int head_x = p.pos_x;
+         int head_y = p.pos_y;
+         int tail_x = p.pos_x + (p.ori == 1 ? p.len - 1 : 0);
+         int tail_y = p.pos_y + (p.ori == 0 ? p.len - 1 : 0);
+
+         switch (exitDir) {
+            case RIGHT:
+            if (move.arah == "kanan" && tail_y >= ey) isExitMove = true;
+            break;
+            case LEFT:
+            if (move.arah == "kiri"  && head_y <= ey) isExitMove = true;
+            break;
+            case DOWN:
+            if (move.arah == "bawah" && tail_x >= ex) isExitMove = true;
+            break;
+            case UP:
+            if (move.arah == "atas"  && head_x <= ex) isExitMove = true;
+            break;
+            default:
+            break;
+         }
+      }
 
         // 4) Redraw unless it's the exit move
         if (!isExitMove) {
