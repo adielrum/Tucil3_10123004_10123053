@@ -7,8 +7,6 @@
 
 using namespace std;
 
-int N, M, num_piece;
-
 int main()
 {
     while (true) {
@@ -49,6 +47,8 @@ int main()
             temp_board.push_back(temp_row);
             // cout << temp_row;
         }
+
+        input_file.close();
 
         Papan board = Papan(temp_board, N, M);
         vector<Piece> pieces = board.extractPieces();
