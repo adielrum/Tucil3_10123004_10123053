@@ -63,8 +63,13 @@ int main()
         cout << "  1. Greedy Best First Search" << endl;
         cout << "  2. A* Search" << endl;
         cout << "Pilih algoritma (0,1,2): ";
-        getline(cin, algoritma_type); 
-
+        while(getline(cin, algoritma_type)) {
+            if (algoritma_type == "0" || algoritma_type == "1" || algoritma_type == "2") {
+                break;
+            }
+            cout << "Pilihan algoritma tidak valid!" << endl;
+            cout << "Pilih algoritma (0,1,2): ";
+        }
         // State awal
         cout << "\nPapan Awal" << endl;
         board.printGrid();
