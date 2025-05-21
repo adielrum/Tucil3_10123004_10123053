@@ -36,6 +36,11 @@ Berikut langkah-langkah untuk menjalankan program.
    ./build.bat
    ```
 
+4. Run `gui.bat` to build run the GUI program instead
+   ```sh
+   ./gui.bat
+   ```
+
 ## Struktur Program
 
 Berikut struktur dari program ini.
@@ -104,7 +109,6 @@ GPPCDFK
 GH.III
 GHJ...
 LLJMM.
-
 
 Berikut beberapa algoritma pathfinding.
   0. Uniform Cost Search (UCS)
