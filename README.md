@@ -38,7 +38,7 @@ Berikut langkah-langkah untuk menjalankan program.
    ./build.bat
    ```
 
-4. Run `gui.bat` to build run the GUI program instead.
+4. Run `gui.bat` to use the GUI program instead.
    ```sh
    ./gui.bat
    ```
@@ -182,7 +182,15 @@ Gerakan 5: Pindah piece P ke kanan 6 langkah.
 * L L J M M F *
 ```
 
+Jika menggunakan GUI, maka caranya adalah:
+1. Jalankan `gui.bat`
+2. Masukkan Algoritma yang ingin digunakan
+3. (Opsi 1): load file txt yang akan menjadi test_case, lalu pencet "load file"
+4. (Opsi 2): langsung masukkan test case pada tempat yang disediakan
+5. Pencet tombol "solve"
+   
 ## Author
 
 [Adiel Rum](https://github.com/adielrum) (10123004)
+
 [Timothy Niels Ruslim](https://github.com/timoruslim) (10123053)
