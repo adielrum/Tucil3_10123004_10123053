@@ -6,12 +6,15 @@
 #include "solver.h"
 
 using namespace std;
+using namespace chrono;
 
 int N, M, num_piece;
 
 int main()
 {
         int N, M, num_piece;
+        string algoritma_type = "2";
+        cin >> algoritma_type;
         cin >> N >> M >> num_piece;
 
         bool ketemu_k = false;
@@ -32,11 +35,16 @@ int main()
         State current_state(board, moves, pieces, 0);
 
         // Solve papan 
-        string algoritma_type = "2";
         Solver boardSolver = Solver(stoi(algoritma_type));
+        auto start = high_resolution_clock::now();
         vector<pair<Piece, Move>> solution = boardSolver.solveBoard(current_state);
-        cout << endl;
         
+        // Count time
+        auto end = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(end - start);
+        double time = duration.count() / 1000.0;
+        cout << fixed << setprecision(3) << time << " ms. \n" << endl;
+
         if (!solution.empty()) {
             for (size_t i = 0; i < solution.size(); i++) {
                 cout << "Move " << (i+1) << ": ";

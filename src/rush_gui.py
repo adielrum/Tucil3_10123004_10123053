@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext, messagebox
+from tkinter import scrolledtext, messagebox, filedialog
 import subprocess
 import threading
 import os
@@ -12,6 +12,24 @@ class RushHourGUI(tk.Tk):
         self.geometry("800x800")
 
         # Input area
+        tk.Label(self, text="Enter Algorithm (0: UCS, 1: GBFS, 2: A*):").pack(anchor='nw', padx=10, pady=5)
+        self.string_input = tk.Entry(self, width=50)
+        self.string_input.pack(padx=10, pady=(0, 10))
+
+        tk.Label(self, text="Enter path to .txt file (or use Browse):").pack(anchor='nw', padx=10, pady=(5, 0))
+        frame = tk.Frame(self)
+        frame.pack(padx=10, pady=(0, 5), fill='x')
+
+        self.file_path_entry = tk.Entry(frame, width=40)
+        self.file_path_entry.pack(side='left', expand=True, fill='x')
+
+        browse_btn = tk.Button(frame, text="Browse", command=self.browse_file)
+        browse_btn.pack(side='left', padx=(5, 0))
+
+        load_btn = tk.Button(frame, text="Load File", command=self.load_file)
+        load_btn.pack(side='left', padx=(5, 0))
+
+        # Puzzle
         tk.Label(self, text="Enter puzzle (N M, num_pieces, then N rows; optional extra K-row):").pack(anchor='nw', padx=10, pady=5)
         self.input_text = scrolledtext.ScrolledText(self, width=50, height=10)
         self.input_text.pack(padx=10)
@@ -33,25 +51,53 @@ class RushHourGUI(tk.Tk):
         self.grid = []
         self.moves = []
         self.piece_items = {}
+        self.nodes = None
+        self.duration = None
+
+    def browse_file(self):
+        file_path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt")])
+        if file_path:
+            self.file_path_entry.delete(0, tk.END)
+            self.file_path_entry.insert(0, file_path)
+
+    def load_file(self):
+        path = self.file_path_entry.get().strip()
+        if not path or not os.path.isfile(path):
+            messagebox.showerror("Error", "Invalid file path.")
+            return
+        try:
+            with open(path, 'r') as f:
+                content = f.read()
+            self.input_text.delete("1.0", tk.END)
+            self.input_text.insert(tk.END, content)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to read file:\n{e}")
 
     def solve(self):
+        string_part = self.string_input.get().strip()
         input_data = self.input_text.get("1.0", tk.END).strip()
+        
         if not input_data:
             messagebox.showerror("Error", "Please enter puzzle input.")
             return
+
+        # Combine the inputs — modify this logic to suit your format
+        combined_input = string_part + "\n" + input_data if string_part else input_data
+
         self.solve_btn.config(state=tk.DISABLED)
         self.status.config(text="Status: solving...")
-        threading.Thread(target=self.run_solver, args=(input_data,)).start()
+        threading.Thread(target=self.run_solver, args=(combined_input,)).start()
 
     def run_solver(self, input_data):
         # 1) Read & sanitize raw lines
         lines = input_data.splitlines()
         # print(lines)
-        N, M = map(int, lines[0].split())
-        raw = lines[2:2+N]
+        algo = map(int, lines[0].split())
+        N, M = map(int, lines[1].split())
+        raw = lines[3:3+N]
         # if no K found, grab the extra line
-        if (all('K' not in row for row in raw) and len(lines) > 2+N) or ('K' in raw[0]):
-            raw.append(lines[2+N])
+        if (all('K' not in row for row in raw) and len(lines) > 3+N) or ('K' in raw[0]):
+            raw.append(lines[3+N])
 
         def print_Grid(Grid):
             for i in range(len(Grid)):
@@ -66,6 +112,11 @@ class RushHourGUI(tk.Tk):
         for i, row in enumerate(raw):
             if 'K' in row:
                 raw_exit_x, raw_exit_y = i, row.index('K')
+                if(raw_exit_y == 0):
+                    for j, rew in enumerate(raw):
+                        if i != j:
+                            rews = rew.replace(' ', '', 1)
+                            raw[j] = rews
                 row = row.replace('K', '', 1)
                 raw[i] = row
                 # print(raw_exit_x)
@@ -138,17 +189,32 @@ class RushHourGUI(tk.Tk):
 
         # Parse moves from stdout
         self.moves = []
+        nodes = None
+        duration = None
+
         for line in proc.stdout.splitlines():
+            if "Dikunjungi" in line and "ms" in line:
+                match = re.search(r"Dikunjungi (\d+) simpul dalam ([\d.]+) ms", line)
+                if match:
+                    nodes = int(match.group(1))
+                    duration = float(match.group(2))
             m = re.match(r"Move \d+: Piece (\w) moves (\w+) by (\d+)", line)
             if m:
                 name, direction, dist = m.group(1), m.group(2), int(m.group(3))
                 self.moves.append((name, direction, dist))
+        
+        self.nodes = nodes
+        self.duration = duration
 
         # Draw and animate
         self.after(0, self.draw_background)
         self.after(0, self.draw_pieces)
         self.after(500, self.animate_next_move)
-        self.after(0, lambda: self.status.config(text=f"Status: {len(self.moves)} moves loaded"))
+        status_msg = f"Status: {len(self.moves)} moves loaded"
+        if nodes is not None and duration is not None:
+            status_msg += f" | Simpul: {nodes} | Waktu: {duration} ms"
+
+        self.after(0, lambda: self.status.config(text=status_msg))
 
     def draw_background(self):
         self.canvas.delete('all')
@@ -179,11 +245,17 @@ class RushHourGUI(tk.Tk):
 
     def animate_next_move(self):
         if not self.moves:
-            self.status.config(text="Animation complete")
+            extra_info = ""
+            if self.nodes is not None and self.duration is not None:
+                extra_info = f" | Simpul: {self.nodes} | Waktu: {self.duration} ms"
+            self.status.config(text=f"Animation complete{extra_info}")
             self.solve_btn.config(state=tk.NORMAL)
             return
         name, direction, dist = self.moves.pop(0)
-        self.status.config(text=f"Moving {name} {direction} by {dist}")
+        extra_info = ""
+        if self.nodes is not None and self.duration is not None:
+            extra_info = f" | Simpul: {self.nodes} | Waktu: {self.duration} ms"
+        self.status.config(text=f"Moving {name} {direction} by {dist}{extra_info}")
         dx = (direction=='kanan') - (direction=='kiri')
         dy = (direction=='bawah') - (direction=='atas')
         dx *= self.cell_size; dy *= self.cell_size
