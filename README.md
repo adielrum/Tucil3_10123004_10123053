@@ -4,7 +4,9 @@ Ini adalah Tugas Kecil 2 mata kuliah Strategi Algoritma (IF2211) yang berupa pro
 
 ## Algoritma _Pathfinding_
 
-Suatu gambar dapat dikompresi dengan membaginya menjadi empat blok. Lalu, setiap blok akan dibagikan terus-menerus secara rekursif. Jika suatu blok sudah dapat dihampirkan dengan warna rataannya dengan cukup baik (galat di bawah suatu ambang batas), atau blok tersebut sudah cukup kecil, pembagian akan dihentikan. Proses ini dapat dipermudahkan menggunakan data struktur quadtree, dengan setiap simpul merepresentasikan suatu blok dari gambar, lalu simpul daun menyatakan blok yang sudah dihampirkan dengan warna rataannya. Untuk informasi selengkapnya, dapat dilihat di laporan.
+Rush Hour adalah sebuah permainan puzzle logika berbasis grid yang menantang pemain untuk menggeser kendaraan di dalam sebuah kotak (biasanya berukuran 66) agar mobil utama (biasanya berwarna merah) dapat keluar dari kemacetan melalui pintu keluar di sisi papan. Pada tugas ini, dilakukan perumuman grid menjadi sebarang mn, lalu setiap kendaraan direpresentasikan sebagai potongan p1 atau 1p tergantung orientasinya (horizontal atau vertikal) di grid. 
+
+Untuk mencari solusi dari puzzle permainan puzzle rush hour ini, kami memanfaatkan algoritma uninformed search sepeerti UCS dan informed search seperti BGFS dan A*
 
 ## Program Requirements
 
@@ -40,32 +42,39 @@ Berikut struktur dari program ini.
 
 ```
 ├── bin/
-│   ├── App.class
-│   ├── ErrorCalculator.class
-│   ├── GifSequenceWriter.class
-│   ├── Quadtree.class
-│   ├── QuadtreeNode.class
-│   └── ThresholdCalculator.class
+│   ├── gui.exe
+│   ├── main.exe
+│   ├── solver.exe
+│   └── tasks.exe
 ├── doc/
-│   └── Tucil2_K1_10123053_Timothy Niels Ruslim.pdf
-├── lib/
-│   └── gif-sequence-writer.jar
+│   └── Tucil3_K1_10123004_Adiel Rum_Timothy Niels Ruslim.pdf
 ├── src/
-│   ├── App.java
-│   ├── ErrorCalculator.java
-│   ├── GifSequenceWriter.java
-│   ├── Quadtree.java
-│   ├── QuadtreeNode.java
-│   └── ThresholdCalculator.java
+│   ├── gui.cpp
+│   ├── main.cpp
+│   ├── move.cpp
+│   ├── move.h
+│   ├── papan.cpp
+│   ├── papan.h
+│   ├── piece.cpp
+│   ├── piece.h
+│   ├── rush_gui.py
+│   ├── solver.cpp
+│   ├── solver.h
+│   ├── state.cpp
+│   └── state.h
 ├── test/
-│   ├── bird.jpg
-│   ├── boat.jpeg
-│   ├── cabin.png
-│   ├── flowers.jpg
-│   ├── suit.jpeg
-│   ├── timo.jpg
-│   └── tram.png
-└── README.md
+│   ├── impossible_1.txt
+│   ├── medium_bawah.txt
+│   ├── mudah_kanan.txt
+│   ├── mudah_kiri.txt
+│   ├── susah_atas.txt
+│   ├── susah_kanan.txt
+│   ├── susah_atas.txt
+│   └── susah_kiri.txt
+├── .gitignore
+├── README.md
+├── build.bat
+└── run.bat
 ```
 
 ## How It Works
@@ -73,15 +82,98 @@ Berikut struktur dari program ini.
 Program ini berupa CLI. Setelah menjalankan program, berikut masukan yang diperlukan.
 
 1. Alamat dari file .txt yang mengandung konfigurasi papan.
-2.
+2. Algoritma Pilihan (0 untuk UCS, 1 untuk GBFS, 2 untuk A*)
 
 Lalu, program akan menghasilkan keluaran berikut.
 
-1. Waktu eksekusi kompresi (dalam ms).
-2.
-3.
+1. Tampilan awal papan
+2. Banyak simpul yang dikunjungi
+3. Waktu pencaian (dalam ms)
+4. Gerakan-gerakan pada solusi (Piece apa pindah kemana berapa jauh) dan tampilan papan setelah melakukan gerakan tersebut
 
 Berikut contoh penyelesaian permainan Rush Hour yang dilakukan program.
+```
+D:\Projects\stima\Tucil3\Tucil3_10123004_10123053\Tucil3_10123004_10123053\test\mudah_kanan.txt
+
+[Di dalam file mudah_kanan berbentuk seperti ini]
+6 6
+11
+AAB..F
+..BCDF
+GPPCDFK
+GH.III
+GHJ...
+LLJMM.
+
+
+Berikut beberapa algoritma pathfinding.
+  0. Uniform Cost Search (UCS)
+  1. Greedy Best First Search
+  2. A* Search
+Pilih algoritma (0,1,2): 1
+
+Papan Awal
+* * * * * * * *
+* A A B . . F *
+* . . B C D F *
+* G P P C D F K
+* G H . I I I *
+* G H J . . . *
+* L L J M M . *
+* * * * * * * *
+
+Solusi ditemukan!
+Dikunjungi 8 simpul dalam 1.010 ms.
+
+Gerakan 1: Pindah piece C ke atas 1 langkah.
+* * * * * * * *
+* A A B C . F *
+* . . B C D F *
+* G P P . D F K
+* G H . I I I *
+* G H J . . . *
+* L L J M M . *
+* * * * * * * *
+
+Gerakan 2: Pindah piece D ke atas 1 langkah.
+* * * * * * * *
+* A A B C D F *
+* . . B C D F *
+* G P P . . F K
+* G H . I I I *
+* G H J . . . *
+* L L J M M . *
+* * * * * * * *
+
+Gerakan 3: Pindah piece I ke kiri 1 langkah.
+* * * * * * * * 
+* A A B C D F *
+* . . B C D F *
+* G P P . . F K
+* G H I I I . *
+* G H J . . . *
+* L L J M M . *
+* * * * * * * *
+
+Gerakan 4: Pindah piece F ke bawah 3 langkah.
+* * * * * * * *
+* A A B C D . *
+* . . B C D . *
+* G P P . . . K
+* G H I I I F *
+* G H J . . F *
+* L L J M M F *
+* * * * * * * *
+
+Gerakan 5: Pindah piece P ke kanan 6 langkah.
+* * * * * * * *
+* A A B C D . *
+* . . B C D . *
+* G . . . . . K
+* G H I I I F *
+* G H J . . F *
+* L L J M M F *
+```
 
 ## Author
 
