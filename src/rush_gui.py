@@ -50,19 +50,31 @@ class RushHourGUI(tk.Tk):
         N, M = map(int, lines[0].split())
         raw = lines[2:2+N]
         # if no K found, grab the extra line
-        if all('K' not in row for row in raw) and len(lines) > 2+N:
+        if (all('K' not in row for row in raw) and len(lines) > 2+N) or ('K' in raw[0]):
             raw.append(lines[2+N])
 
+        def print_Grid(Grid):
+            for i in range(len(Grid)):
+                for j in range(len(Grid[i])):
+                    print(Grid[i][j],end=" ")
+                print()
+
+        print_Grid(raw)
         # 2) Locate raw K cell and detect empty‐row condition
         raw_exit_x = raw_exit_y = None
         empty_row = False
         for i, row in enumerate(raw):
             if 'K' in row:
                 raw_exit_x, raw_exit_y = i, row.index('K')
+                row = row.replace('K', '', 1)
+                raw[i] = row
+                print(raw_exit_x)
                 # check if every other character is space (or '.') 
-                if all((j==raw_exit_y) or (c in ' .') for j,c in enumerate(row)):
+                if raw_exit_x == 0 or raw_exit_y == len(raw):
                     empty_row = True
                 break
+        
+        print_Grid(raw)
 
         # 3) If it was an empty row, delete it
         if empty_row and raw_exit_x in (0, len(raw)-1):
@@ -73,7 +85,7 @@ class RushHourGUI(tk.Tk):
 
         # 4) Build sanitized grid (replace K with '.')
         sanitized = [ (r.replace('K','.') + '.'*M)[:M] for r in raw ]
-        print(sanitized)
+        print_Grid(sanitized)
         # 5) Compute padded exit_x,exit_y
         # after deletion, raw_exit_x may have changed if bottom
         if raw_exit_x is None:
