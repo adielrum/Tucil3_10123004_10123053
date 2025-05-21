@@ -1,12 +1,14 @@
 # Tugas Kecil 3 | Strategi Algoritma (IF2211)
 
-Ini adalah Tugas Kecil 2 mata kuliah Strategi Algoritma (IF2211) yang berupa program penyelesaian permainan Rush Hour.
+Ini adalah Tugas Kecil 3 mata kuliah Strategi Algoritma (IF2211) yang berupa program penyelesaian permainan Rush Hour. 
+
+## Permainan Rush Hour 
+
+Rush Hour adalah sebuah permainan puzzle logika berbasis grid yang menantang pemain untuk menggeser kendaraan di dalam sebuah kotak (biasanya berukuran $6 \times 6$) agar mobil utama (biasanya berwarna merah) dapat keluar dari kemacetan melalui pintu keluar di sisi papan. Pada tugas ini, dilakukan perumuman grid menjadi sebarang mn, lalu setiap kendaraan direpresentasikan sebagai potongan $p \times 1$ atau $1 \times p$ tergantung orientasinya (horizontal atau vertikal) di grid. 
 
 ## Algoritma _Pathfinding_
 
-Rush Hour adalah sebuah permainan puzzle logika berbasis grid yang menantang pemain untuk menggeser kendaraan di dalam sebuah kotak (biasanya berukuran 66) agar mobil utama (biasanya berwarna merah) dapat keluar dari kemacetan melalui pintu keluar di sisi papan. Pada tugas ini, dilakukan perumuman grid menjadi sebarang mn, lalu setiap kendaraan direpresentasikan sebagai potongan p1 atau 1p tergantung orientasinya (horizontal atau vertikal) di grid. 
-
-Untuk mencari solusi dari puzzle permainan puzzle rush hour ini, kami memanfaatkan algoritma uninformed search sepeerti UCS dan informed search seperti BGFS dan A*
+Untuk mencari solusi dari puzzle permainan puzzle rush hour ini, kami memanfaatkan algoritma uninformed search seperti Uniform Cost Search (UCS) dan informed search seperti Greedy Best First Search (GBFS) dan A* Search. UCS menggunakan fungsi evaluasi berupa harga jarak dari suatu status ke status awal, GBFS menggunakan fungsi evaluasi berupa taksiran harga jarak dari suatu status ke status tujuan menggunakan suatu heuristik, dan A* menggunakan fungsi evaluasi kombinasi dari keduanya. Agar solusi yang digunakan optimal, A* harus menggunakan heuristik yang admissible. Untuk Rush Hour, kami pilih heuristik jumlah kendaraan yang menghalangi jalur keluar. 
 
 ## Program Requirements
 
@@ -36,7 +38,7 @@ Berikut langkah-langkah untuk menjalankan program.
    ./build.bat
    ```
 
-4. Run `gui.bat` to build run the GUI program instead
+4. Run `gui.bat` to build run the GUI program instead.
    ```sh
    ./gui.bat
    ```
@@ -79,6 +81,7 @@ Berikut struktur dari program ini.
 ├── .gitignore
 ├── README.md
 ├── build.bat
+├── gui.bat
 └── run.bat
 ```
 
@@ -98,8 +101,6 @@ Lalu, program akan menghasilkan keluaran berikut.
 
 Berikut contoh penyelesaian permainan Rush Hour yang dilakukan program.
 ```
-D:\Projects\stima\Tucil3\Tucil3_10123004_10123053\Tucil3_10123004_10123053\test\mudah_kanan.txt
-
 [Di dalam file mudah_kanan berbentuk seperti ini]
 6 6
 11
@@ -109,6 +110,8 @@ GPPCDFK
 GH.III
 GHJ...
 LLJMM.
+
+Masukan file (.txt): test\mudah_kanan.txt
 
 Berikut beberapa algoritma pathfinding.
   0. Uniform Cost Search (UCS)
