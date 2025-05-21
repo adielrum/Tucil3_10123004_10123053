@@ -12,6 +12,7 @@ Papan::Papan(vector<string> _grid, int _rows, int _cols)
     int raw_exit_y = -1;
     bool empty_row = false;
     int row_delete = -1;
+    int col_delete = -1;
 
     for (int i = 0; i < _grid.size(); i++) {
 
@@ -22,7 +23,7 @@ Papan::Papan(vector<string> _grid, int _rows, int _cols)
             // Save exit cell coordinates
             raw_exit_x = i;  
             raw_exit_y = static_cast<int>(pos); 
-            
+
             // Check if top or bottom exit 
             int non_empty_count = 0;
             for (int j = 0; j < _grid[i].size(); ++j) {
@@ -35,8 +36,11 @@ Papan::Papan(vector<string> _grid, int _rows, int _cols)
 
             // Erase exit cell 
             _grid[i].erase(pos, 1);  
-            if (empty_row && (i == 0 || i == _rows)) {
-                row_delete = i;
+            if (i == 0 || i == _rows) {
+                row_delete = raw_exit_x;
+            }
+            if (pos == 0 || pos == _cols) {
+                col_delete = raw_exit_y;
             }
 
             // Check if valid exit 
@@ -66,7 +70,7 @@ Papan::Papan(vector<string> _grid, int _rows, int _cols)
             // Early return if invalid
             if (!found_primary) {
                 is_valid = false;
-                return;
+                // return;
             }
 
             // Add padding 
@@ -120,6 +124,15 @@ Papan::Papan(vector<string> _grid, int _rows, int _cols)
     // Remove exit row if necessary
     if (row_delete != -1) {
         _grid.erase(_grid.begin() + row_delete);
+    }
+
+    // Remove exit column if necessary
+    if (col_delete == 0) {
+        for (string& row : _grid) {
+            if (!row.empty() && isspace(row[0])) {
+                row.erase(0, 1);  // Remove whitespace 
+            }
+        }
     }
 
     // Copy grid to papan
